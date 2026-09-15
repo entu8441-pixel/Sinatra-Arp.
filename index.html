@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SINATRA ARP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,500;0,700;0,900;1,500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#0a0710;
+    --bg-1:#150e1f;
+    --bg-2:#1d1428;
+    --pink:#ff3d81;
+    --pink-dim:#7a1f47;
+    --gold:#d8a640;
+    --gold-dim:#5c471f;
+    --ink:#f3ece2;
+    --ink-dim:#a99bb3;
+    --hair:rgba(216,166,64,0.22);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg-0);
+    color:var(--ink);
+    font-family:'Space Grotesk',sans-serif;
+    line-height:1.6;
+  }
+  a{color:inherit;}
+  .wrap{max-width:960px;margin:0 auto;padding:0 28px;}
+
+  /* ---- Nav ---- */
+  header{
+    position:sticky;top:0;z-index:10;
+    background:rgba(10,7,16,0.85);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--hair);
+  }
+  nav.wrap{
+    display:flex;align-items:center;justify-content:space-between;
+    padding-top:16px;padding-bottom:16px;
+  }
+  .brand{
+    display:flex;align-items:center;gap:10px;
+    font-family:'Bodoni Moda',serif;
+    font-weight:700;
+    font-style:italic;
+    font-size:20px;
+    letter-spacing:0.5px;
+  }
+  .logo-mark{flex-shrink:0;border-radius:50%;object-fit:cover;background:#000;}
+  .navlinks{display:flex;gap:26px;font-size:14px;color:var(--ink-dim);}
+  .navlinks a{text-decoration:none;transition:color .2s;}
+  .navlinks a:hover{color:var(--pink);}
+  .navjoin{
+    font-size:13px;padding:8px 16px;border:1px solid var(--pink);
+    border-radius:2px;color:var(--pink);text-decoration:none;
+    white-space:nowrap;
+  }
+  .navjoin:hover{background:var(--pink);color:var(--bg-0);}
+
+  /* ---- Hero ---- */
+  .hero{
+    padding:88px 0 72px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";position:absolute;inset:0;
+    background:radial-gradient(ellipse 600px 300px at 15% 20%, rgba(255,61,129,0.14), transparent 70%),
+               radial-gradient(ellipse 500px 260px at 90% 60%, rgba(216,166,64,0.10), transparent 70%);
+    pointer-events:none;
+  }
+  .hero-inner{position:relative;display:grid;grid-template-columns:1.5fr 1fr;gap:40px;align-items:end;}
+  .kicker{
+    font-size:13px;color:var(--gold);letter-spacing:0.06em;margin:0 0 18px;
+  }
+  h1.title{
+    font-family:'Bodoni Moda',serif;
+    font-weight:900;
+    font-style:italic;
+    font-size:clamp(44px,7vw,76px);
+    line-height:0.98;
+    margin:0 0 22px;
+    text-shadow:0 0 22px rgba(255,61,129,0.35), 0 0 60px rgba(255,61,129,0.12);
+  }
+  .lede{font-size:16px;color:var(--ink-dim);max-width:46ch;margin:0 0 30px;}
+  .cta-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+  .btn-primary{
+    background:var(--pink);color:#1a0410;
+    font-weight:700;font-size:15px;
+    padding:14px 26px;border-radius:2px;
+    text-decoration:none;display:inline-block;
+    box-shadow:0 0 26px rgba(255,61,129,0.45);
+    transition:transform .15s, box-shadow .15s;
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 34px rgba(255,61,129,0.6);}
+  .memberline{font-size:13px;color:var(--ink-dim);}
+  .memberline b{color:var(--gold);font-weight:600;}
+
+  .hero-card{
+    background:var(--bg-1);
+    border:1px solid var(--hair);
+    border-radius:4px;
+    padding:26px;
+  }
+  .hero-card p.label{font-size:12px;color:var(--ink-dim);margin:0 0 4px;}
+  .hero-card p.big{font-family:'Bodoni Moda',serif;font-size:32px;margin:0 0 18px;color:var(--gold);}
+  .divider-thin{height:1px;background:var(--hair);margin:16px 0;}
+
+  /* ---- Sections ---- */
+  section{padding:64px 0;border-top:1px solid var(--hair);}
+  h2.sec-title{
+    font-family:'Bodoni Moda',serif;
+    font-style:italic;
+    font-weight:700;
+    font-size:34px;
+    margin:0 0 34px;
+    color:var(--ink);
+  }
+
+  /* Rules — real sequence, numbered */
+  .rules{list-style:none;margin:0;padding:0;counter-reset:rulenum;}
+  .rules li{
+    counter-increment:rulenum;
+    display:grid;grid-template-columns:52px 1fr;gap:18px;
+    padding:20px 0;border-bottom:1px solid var(--hair);
+  }
+  .rules li:first-child{padding-top:0;}
+  .rules li::before{
+    content:counter(rulenum);
+    font-family:'Bodoni Moda',serif;font-style:italic;font-size:28px;
+    color:var(--pink);
+  }
+  .rules h3{margin:0 0 6px;font-size:16px;font-weight:500;}
+  .rules p{margin:0;color:var(--ink-dim);font-size:14px;}
+
+  /* Announcements */
+  .notes{display:flex;flex-direction:column;gap:0;}
+  .note{
+    display:grid;grid-template-columns:96px 1fr;gap:20px;
+    padding:20px 0;border-bottom:1px solid var(--hair);
+  }
+  .note:last-child{border-bottom:none;}
+  .note .date{color:var(--gold);font-size:13px;padding-top:2px;}
+  .note h3{margin:0 0 6px;font-size:16px;font-weight:500;}
+  .note p{margin:0;color:var(--ink-dim);font-size:14px;}
+  .note-placeholder{
+    margin-top:18px;font-size:13px;color:var(--ink-dim);
+    border-left:2px solid var(--gold-dim);padding-left:14px;
+  }
+
+  /* Members / roles */
+  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:40px;}
+  .stat{
+    background:var(--bg-1);border:1px solid var(--hair);border-radius:4px;
+    padding:20px;
+  }
+  .stat .n{font-family:'Bodoni Moda',serif;font-size:30px;color:var(--gold);}
+  .stat .l{font-size:12px;color:var(--ink-dim);margin-top:4px;}
+
+  .roles{width:100%;border-collapse:collapse;font-size:14px;}
+  .roles th{
+    text-align:left;font-weight:500;color:var(--ink-dim);
+    font-size:12px;padding-bottom:10px;border-bottom:1px solid var(--hair);
+  }
+  .roles td{padding:14px 0;border-bottom:1px solid var(--hair);}
+  .roles td.role-name{color:var(--pink);font-weight:500;}
+
+  /* Footer */
+  footer{
+    padding:56px 0 40px;text-align:center;border-top:1px solid var(--hair);
+  }
+  footer .brand{display:flex;justify-content:center;margin-bottom:10px;font-size:22px;}
+  footer p{color:var(--ink-dim);font-size:13px;margin:0 0 22px;}
+
+  /* About / intro */
+  .about{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;}
+  .about .lead{font-family:'Bodoni Moda',serif;font-style:italic;font-size:22px;color:var(--gold);margin:0 0 18px;line-height:1.35;}
+  .about p{color:var(--ink-dim);font-size:15px;margin:0 0 16px;}
+  .about-points{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px;}
+  .about-points li{display:grid;grid-template-columns:20px 1fr;gap:12px;font-size:14px;color:var(--ink-dim);}
+  .about-points li::before{content:"—";color:var(--pink);}
+
+  /* Marketing invite banner */
+  .promo{
+    position:relative;overflow:hidden;
+    background:var(--bg-1);
+    border:1px solid var(--hair);
+    border-radius:6px;
+    padding:52px 44px;
+    text-align:center;
+  }
+  .promo::before{
+    content:"";position:absolute;inset:0;
+    background:radial-gradient(ellipse 500px 260px at 50% 0%, rgba(255,61,129,0.20), transparent 70%);
+    pointer-events:none;
+  }
+  .promo-eyebrow{position:relative;color:var(--pink);font-size:13px;margin:0 0 14px;}
+  .promo h2{
+    position:relative;
+    font-family:'Bodoni Moda',serif;font-style:italic;font-weight:900;
+    font-size:clamp(30px,5vw,46px);margin:0 0 16px;
+    text-shadow:0 0 24px rgba(255,61,129,0.35);
+  }
+  .promo p{position:relative;color:var(--ink-dim);font-size:15px;max-width:48ch;margin:0 auto 30px;}
+  .promo-link-row{
+    position:relative;display:inline-flex;align-items:center;gap:0;
+    background:var(--bg-0);border:1px solid var(--gold-dim);border-radius:3px;
+    overflow:hidden;margin-bottom:18px;
+  }
+  .promo-link-row span{padding:12px 18px;font-size:14px;color:var(--gold);font-family:monospace;}
+  .promo-link-row a{
+    padding:12px 22px;background:var(--pink);color:#1a0410;
+    font-weight:700;font-size:14px;text-decoration:none;white-space:nowrap;
+  }
+  .promo-note{position:relative;font-size:12px;color:var(--ink-dim);opacity:0.8;}
+
+  /* Channels */
+  .channel-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+  .channel-card{
+    background:var(--bg-1);border:1px solid var(--hair);border-radius:4px;
+    padding:22px;
+  }
+  .channel-head{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;}
+  .channel-head .hash{color:var(--pink);font-size:16px;font-weight:700;}
+  .channel-head .name{font-size:15px;font-weight:500;}
+  .channel-desc{font-size:13px;color:var(--ink-dim);margin:0 0 16px;}
+  .chat-mock{
+    background:var(--bg-0);border:1px solid var(--hair);border-radius:4px;
+    padding:14px;display:flex;flex-direction:column;gap:14px;
+  }
+  .msg{display:grid;grid-template-columns:30px 1fr;gap:10px;}
+  .avatar{
+    width:30px;height:30px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:700;color:var(--bg-0);
+  }
+  .avatar.a1{background:var(--pink);}
+  .avatar.a2{background:var(--gold);}
+  .msg-head{display:flex;align-items:baseline;gap:8px;margin-bottom:2px;}
+  .msg-head .u{font-size:13px;font-weight:500;}
+  .msg-head .t{font-size:11px;color:var(--ink-dim);}
+  .msg-text{font-size:13px;color:var(--ink-dim);margin:0;}
+
+  /* Leaderboard — podium style */
+  .lb-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:34px;}
+  .lb-header .sec-title{margin:0;}
+  .lb-tabs{display:flex;gap:8px;background:var(--bg-1);border:1px solid var(--hair);border-radius:24px;padding:4px;}
+  .lb-tab-btn{
+    font-family:'Space Grotesk',sans-serif;font-size:13px;padding:8px 20px;border-radius:20px;
+    border:none;background:transparent;color:var(--ink-dim);cursor:pointer;transition:all .15s;
+  }
+  .lb-tab-btn.active{background:var(--pink);color:#1a0410;font-weight:600;}
+
+  .podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;align-items:end;margin-bottom:8px;text-align:center;}
+  .podium-card{display:flex;flex-direction:column;align-items:center;}
+  .crown{font-size:20px;color:var(--gold);margin-bottom:4px;text-shadow:0 0 10px rgba(216,166,64,0.6);}
+  .podium-avatar{
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-family:'Bodoni Moda',serif;font-style:italic;font-weight:700;color:var(--ink);
+    background:var(--bg-2);margin-bottom:12px;
+  }
+  .podium-name{font-size:14px;margin:0 0 14px;}
+  .pedestal{
+    width:100%;background:linear-gradient(180deg,var(--bg-2),var(--bg-1));
+    border:1px solid var(--hair);border-radius:6px 6px 0 0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  }
+  .pedestal .rank-num{font-family:'Bodoni Moda',serif;font-style:italic;font-size:30px;color:var(--gold);}
+  .pedestal .val{font-size:12px;color:var(--ink-dim);}
+  .p1-wrap .podium-avatar{width:88px;height:88px;font-size:22px;border:3px solid var(--gold);box-shadow:0 0 22px rgba(216,166,64,0.35);}
+  .p2-wrap .podium-avatar{width:66px;height:66px;font-size:17px;border:3px solid #cfd4da;}
+  .p3-wrap .podium-avatar{width:66px;height:66px;font-size:17px;border:3px solid #cd8a52;}
+  .pedestal.p1{height:118px;}
+  .pedestal.p2{height:84px;}
+  .pedestal.p3{height:64px;}
+
+  .lb-table{width:100%;border-collapse:collapse;margin-top:36px;font-size:14px;}
+  .lb-table th{
+    text-align:left;font-weight:500;color:var(--ink-dim);font-size:12px;
+    padding-bottom:10px;border-bottom:1px solid var(--hair);
+  }
+  .lb-table td{padding:13px 0;border-bottom:1px solid var(--hair);vertical-align:middle;}
+  .lb-avatar-sm{
+    width:26px;height:26px;border-radius:50%;background:var(--bg-2);
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:10px;font-weight:700;color:var(--ink);margin-right:10px;vertical-align:middle;
+  }
+  .lb-table .bar{width:100%;max-width:120px;height:5px;background:var(--bg-2);border-radius:3px;overflow:hidden;}
+  .lb-table .bar span{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--pink));}
+  .lb-note{margin-top:22px;font-size:12px;color:var(--ink-dim);border-left:2px solid var(--gold-dim);padding-left:14px;}
+
+  @media (max-width:720px){
+    .hero-inner{grid-template-columns:1fr;}
+    .stat-grid{grid-template-columns:1fr 1fr;}
+    .navlinks{display:none;}
+    .about{grid-template-columns:1fr;}
+    .channel-grid{grid-template-columns:1fr;}
+    .lb-header{flex-direction:column;align-items:flex-start;}
+    .podium{gap:8px;}
+    .podium-name{font-size:12px;}
+    .promo-link-row{flex-direction:column;width:100%;}
+    .promo-link-row span,.promo-link-row a{width:100%;text-align:center;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <span class="brand">
+      <img class="logo-mark" src="a_420c8959b1814653371eca4e12d88bb1.gif" width="30" height="30" alt="Sinatra ARP logo">
+      Sinatra ARP
+    </span>
+    <div class="navlinks">
+      <a href="#about">Танилцуулга</a>
+      <a href="#rules">Дүрэм</a>
+      <a href="#channels">Сувгууд</a>
+      <a href="#leaderboard">Тэргүүлэгчид</a>
+      <a href="#members">Гишүүд</a>
+    </div>
+    <a class="navjoin" href="https://discord.gg/EbKXxtTm7">Join</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <div class="wrap hero-inner">
+    <div>
+      <p class="kicker">Advance role-play community</p>
+      <h1 class="title">Sinatra<br>ARP</h1>
+      <p class="lede">Дүр бүтээж, түүхээ хамтдаа өрнүүл. Хатуу дүрэмтэй, гэхдээ дулаан агшин олонтой RP орчин — чиний дараагийн үзэгдэл эндээс эхэлнэ.</p>
+      <div class="cta-row">
+        <a class="btn-primary" href="https://discord.gg/EbKXxtTm7">Discord-д нэгдэх</a>
+        <span class="memberline"><b><span class="js-member-count">199</span>+</b> гишүүн онлайн чатлаж байна</span>
+      </div>
+    </div>
+    <div class="hero-card">
+      <p class="label">Одоогийн бүрэлдэхүүн</p>
+      <p class="big"><span class="js-member-count">199</span>+ гишүүн</p>
+      <div class="divider-thin"></div>
+      <p class="label">Voice + Text channel</p>
+      <p style="margin:4px 0 0;font-size:14px;color:var(--ink-dim);"> 24/7 нээлттэй</p>
+    </div>
+  </div>
+</div>
+
+<section id="about">
+  <div class="wrap about">
+    <div>
+      <p class="lead"></p>
+      <p>Sinatra ARP бол 2026 оноос хойш ажиллаж буй advance role-play community. Бид дүрийн гүн, түүхийн бодит байдал, гишүүдийн хоорондын харилцаанд анхаарлаа хандуулдаг — түргэн хугацааны trend биш, урт хугацааны storyline бүтээдэг.</p>
+    </div>
+    <ul class="about-points">
+      <li>199+ идэвхтэй гишүүнтэй, өдөр бүр шинэ storyline</li>
+      <li>Voice болон text RP хоёулаа дэмждэг</li>
+      <li>Шинэ гишүүнд зориулсан онбординг, ментор систем</li>
+      <li>Тогтмол event, seasonal arc зохион байгуулдаг</li>
+    </ul>
+  </div>
+</section>
+
+<section id="rules">
+  <div class="wrap">
+    <h2 class="sec-title">Дүрэм</h2>
+    <ol class="rules">
+      <li>
+        <div>
+          <h3> Ерөнхий дүрэм</h3>
+          <p>-Бусад гишүүдтэй хүндэтгэлтэй харилцана.
+-Доромжлол, дарамт, ялгаварлан гадуурхалт, хэрүүл маргаан гаргахыг хориглоно.
+-Spam, flood болон бусдад саад болох үйлдэл хийхгүй.
+-NSFW, зохисгүй болон дүрэм зөрчсөн контент нийтлэхгүй.</p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <h3> Character дүрэм</h3>
+          <p>-Өөрийн дүрийн нэр, нас, түүхийг зохистой байдлаар сонгоно.
+-Бусдын дүрийг хуулбарлахгүй.
+-Өөрийн дүрийн давуу талыг хэтрүүлэн ашиглахгүй.
+-Character хоорондын асуудлыг бодит амьдралын харилцаатай холихгүй.</p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <h3> Voice / Chat</h3>
+          <p>Voice call-д микрофоноо зохистой ашиглана.
+-Хөгжим, soundboard, scream болон бусдад саад болох дуу чимээг зөвшөөрөлгүй ашиглахгүй.
+-Бусдын яриаг зориудаар таслах, микрофоноор spam хийхийг хориглоно.</p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <h3>Спам, сурталчилгаа хориотой</h3>
+          <p>Бусад server, бүтээгдэхүүн, линкийг зөвшөөрөлгүй сурталчлахгүй байх.</p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <h3> Staff & Punishment </h3>
+          <p>Staff-ийн шийдвэрийг хүндэтгэнэ.
+-Дүрэм зөрчсөн тохиолдолд warning, mute, kick, timeout эсвэл ban авах боломжтой.
+-Staff-тай маргалдах, дарамтлах, шийдвэрийг зориудаар үл хүндэтгэхийг хориглоно.
+-Авсан арга хэмжээтэй холбоотой асуудлыг зохих сувгаар тайван байдлаар шийдвэрлэнэ.
+</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="channels">
+  <div class="wrap">
+    <h2 class="sec-title">Сувгууд</h2>
+
+    <div class="channel-grid">
+
+      <div class="channel-card">
+        <div class="channel-head"><span class="hash">#</span><span class="name">welcome</span></div>
+        <p class="channel-desc">Шинэ гишүүн эхлээд ирдэг сувag — мэндчилгээ, дүрмийн товч танилцуулга, роль сонгох заавартай.</p>
+        <div class="chat-mock">
+          <div class="msg">
+            <div class="avatar a2">SB</div>
+            <div>
+              <div class="msg-head"><span class="u">Sinatra Bot</span><span class="t">12:04</span></div>
+              <p class="msg-text">Тавтай морил! Эхлээд #rules унш, дараа нь дүрээ бүртгүүлээрэй.</p>
+            </div>
+          </div>
+          <div class="msg">
+            <div class="avatar a1">NM</div>
+            <div>
+              <div class="msg-head"><span class="u">Nomin</span><span class="t">12:06</span></div>
+              <p class="msg-text">Сая нэгдлээ, баяртай байна энд ирсэндээ 🙂</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="channel-card">
+        <div class="channel-head"><span class="hash">#</span><span class="name">roleplay-general</span></div>
+        <p class="channel-desc">Үндсэн RP явагдах сувag. Дүрийн харилцан яриа, түүхийн үйл явдал эндээс өрнөнө.</p>
+        <div class="chat-mock">
+          <div class="msg">
+            <div class="avatar a1">EJ</div>
+            <div>
+              <div class="msg-head"><span class="u">Enkhjin</span><span class="t">21:14</span></div>
+              <p class="msg-text">*Тэр гудамжны буланд зогсоод тамхиа асаав.* Хэн ч намайг олохгүй гэж бодсон.</p>
+            </div>
+          </div>
+          <div class="msg">
+            <div class="avatar a2">TB</div>
+            <div>
+              <div class="msg-head"><span class="u">Tuguldur</span><span class="t">21:16</span></div>
+              <p class="msg-text">*Сүүдрээс гарч ирээд* Чи буруу бодсон юм байна.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="channel-card">
+        <div class="channel-head"><span class="hash">#</span><span class="name">looking-for-rp</span></div>
+        <p class="channel-desc">RP хамтрагч хайж буй гишүүд энд зарлаж, дүрийн харилцан яриа эхлүүлдэг.</p>
+        <div class="chat-mock">
+          <div class="msg">
+            <div class="avatar a1">OT</div>
+            <div>
+              <div class="msg-head"><span class="u">Otgoo</span><span class="t">18:32</span></div>
+              <p class="msg-text">Кафены дүр хайж байна, хэн нэгэн хамтрах уу?</p>
+            </div>
+          </div>
+          <div class="msg">
+            <div class="avatar a2">SR</div>
+            <div>
+              <div class="msg-head"><span class="u">Saruul</span><span class="t">18:35</span></div>
+              <p class="msg-text">Би орно! DM бичлээ.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="channel-card">
+        <div class="channel-head"><span class="hash">#</span><span class="name">gallery</span></div>
+        <p class="channel-desc">Дүрийн зураг, edit, aesthetic мэдээллээ хуваалцах сувag.</p>
+        <div class="chat-mock">
+          <div class="msg">
+            <div class="avatar a1">MR</div>
+            <div>
+              <div class="msg-head"><span class="u">Mөрөн</span><span class="t">09:47</span></div>
+              <p class="msg-text">Шинэ дүрийнхээ moodboard-оо хийлээ, юу гэж бодож байна?</p>
+            </div>
+          </div>
+          <div class="msg">
+            <div class="avatar a2">BT</div>
+            <div>
+              <div class="msg-head"><span class="u">Bat</span><span class="t">09:50</span></div>
+              <p class="msg-text">Маш гоё гарчээ, ялангуяа өнгөний сонголт нь.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="leaderboard">
+  <div class="wrap">
+    <div class="lb-header">
+      <h2 class="sec-title">Тэргүүлэгчид</h2>
+      <div class="lb-tabs">
+        <button class="lb-tab-btn active" data-tab="msg">Мессеж</button>
+        <button class="lb-tab-btn" data-tab="voice">Voice</button>
+      </div>
+    </div>
+
+    <div class="lb-panel" data-panel="msg">
+      <div class="podium">
+        <div class="podium-card p2-wrap" style="order:1">
+          <div class="podium-avatar">TB</div>
+          <p class="podium-name">Tuguldur</p>
+          <div class="pedestal p2"><span class="rank-num">2</span><span class="val">3,955 мессеж</span></div>
+        </div>
+        <div class="podium-card p1-wrap" style="order:2">
+          <span class="crown">♛</span>
+          <div class="podium-avatar">EJ</div>
+          <p class="podium-name">Enkhjin</p>
+          <div class="pedestal p1"><span class="rank-num">1</span><span class="val">4,812 мессеж</span></div>
+        </div>
+        <div class="podium-card p3-wrap" style="order:3">
+          <div class="podium-avatar">OT</div>
+          <p class="podium-name">Otgoo</p>
+          <div class="pedestal p3"><span class="rank-num">3</span><span class="val">3,210 мессеж</span></div>
+        </div>
+      </div>
+
+      <table class="lb-table">
+        <thead><tr><th>№</th><th>Гишүүн</th><th>Мессеж</th><th>Идэвх</th></tr></thead>
+        <tbody>
+          <tr><td>4</td><td><span class="lb-avatar-sm">SR</span>Saruul</td><td>2,884</td><td><div class="bar"><span style="width:60%"></span></div></td></tr>
+          <tr><td>5</td><td><span class="lb-avatar-sm">NM</span>Nomin</td><td>2,470</td><td><div class="bar"><span style="width:51%"></span></div></td></tr>
+          <tr><td>6</td><td><span class="lb-avatar-sm">BT</span>Bat</td><td>2,105</td><td><div class="bar"><span style="width:44%"></span></div></td></tr>
+          <tr><td>7</td><td><span class="lb-avatar-sm">MR</span>Mөрөн</td><td>1,780</td><td><div class="bar"><span style="width:37%"></span></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="lb-panel" data-panel="voice" style="display:none;">
+      <div class="podium">
+        <div class="podium-card p2-wrap" style="order:1">
+          <div class="podium-avatar">MR</div>
+          <p class="podium-name">Mөрөн</p>
+          <div class="pedestal p2"><span class="rank-num">2</span><span class="val">96 цаг</span></div>
+        </div>
+        <div class="podium-card p1-wrap" style="order:2">
+          <span class="crown">♛</span>
+          <div class="podium-avatar">BT</div>
+          <p class="podium-name">Bat</p>
+          <div class="pedestal p1"><span class="rank-num">1</span><span class="val">128 цаг</span></div>
+        </div>
+        <div class="podium-card p3-wrap" style="order:3">
+          <div class="podium-avatar">EJ</div>
+          <p class="podium-name">Enkhjin</p>
+          <div class="pedestal p3"><span class="rank-num">3</span><span class="val">81 цаг</span></div>
+        </div>
+      </div>
+
+      <table class="lb-table">
+        <thead><tr><th>№</th><th>Гишүүн</th><th>Цаг</th><th>Идэвх</th></tr></thead>
+        <tbody>
+          <tr><td>4</td><td><span class="lb-avatar-sm">SB</span>Sarnai</td><td>64h</td><td><div class="bar"><span style="width:50%"></span></div></td></tr>
+          <tr><td>5</td><td><span class="lb-avatar-sm">TB</span>Tuguldur</td><td>52h</td><td><div class="bar"><span style="width:41%"></span></div></td></tr>
+          <tr><td>6</td><td><span class="lb-avatar-sm">OT</span>Otgoo</td><td>39h</td><td><div class="bar"><span style="width:31%"></span></div></td></tr>
+          <tr><td>7</td><td><span class="lb-avatar-sm">NM</span>Nomin</td><td>28h</td><td><div class="bar"><span style="width:22%"></span></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="lb-note">Эдгээр тоо жишээ дата — бодит leaderboard харуулахын тулд Mee6, Tatsu, Arcane зэрэг leveling bot ашиглах эсвэл өөрийн bot-оос дата татаж энэ хэсгийг автоматжуулах хэрэгтэй.</p>
+  </div>
+</section>
+
+<section id="members">
+  <div class="wrap">
+    <h2 class="sec-title">Гишүүд</h2>
+    <div class="stat-grid">
+      <div class="stat"><div class="n"><span class="js-member-count">199</span>+</div><div class="l">Нийт гишүүн</div></div>
+      <div class="stat"><div class="n">24/7</div><div class="l">Идэвхтэй чат</div></div>
+      <div class="stat"><div class="n">4</div><div class="l">Багийн зэрэглэл</div></div>
+    </div>
+    <table class="roles">
+      <thead>
+        <tr><th>Зэрэглэл</th><th>Үүрэг</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="role-name">Эзэмшигч</td><td>Server-ийн ерөнхий чиглэл, эцсийн шийдвэр</td></tr>
+        <tr><td class="role-name">Админ</td><td>Дүрэм, дэд бүтэц, гишүүнчлэл удирдах</td></tr>
+        <tr><td class="role-name">Модератор</td><td>Чат хяналт, маргаан шийдвэрлэх</td></tr>
+        <tr><td class="role-name">Гишүүн</td><td>RP-д оролцох, community амьдрал</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="join">
+  <div class="wrap">
+    <div class="promo">
+      <p class="promo-eyebrow">Байрны тоо хязгаарлагдмал биш — гэхдээ дараагийн дүр чинь хүлээж байна</p>
+      <h2>Sinatra-д нэгдэх цаг боллоо</h2>
+      <p><span class="js-member-count">199</span>+ гишүүнтэй нэг community, хамтдаа бичих нэг л түүх. Одоо орж, өөрийн дүрээ бүтээгээрэй.</p>
+      <div class="promo-link-row">
+        <span>discord.gg/EbKXxtTm7</span>
+        <a href="https://discord.gg/EbKXxtTm7">Одоо нэгдэх</a>
+      </div>
+      <p class="promo-note">Үнэгүй · 24/7 нээлттэй · Voice + text RP</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span class="brand" style="justify-content:center;font-family:'Bodoni Moda',serif;font-style:italic;">
+      <img class="logo-mark" src="assets/phoenix-logo.gif" width="26" height="26" alt="Sinatra ARP logo">
+      Sinatra ARP
+    </span>
+    <p>Түүхээ бичих цаг боллоо.</p>
+    <a class="btn-primary" href="https://discord.gg/EbKXxtTm7">Discord-д нэгдэх</a>
+  </div>
+</footer>
+
+```html
+<script>
+  // =========================================================
+  // SINATRA ARP LIVE DATA
+  // =========================================================
+
+  const INVITE_CODE = 'EbKXxtTm7';
+
+  // Хэрэв website + bot нэг компьютер дээр ажиллаж байгаа бол:
+  const API_URL = 'http://localhost:3000/api/leaderboard';
+
+
+  // =========================================================
+  // DISCORD MEMBER COUNT
+  // =========================================================
+
+  async function updateMemberCount() {
+    try {
+      const res = await fetch(
+        `https://discord.com/api/v10/invites/${INVITE_CODE}?with_counts=true`
+      );
+
+      if (!res.ok) {
+        throw new Error('Discord invite API error');
+      }
+
+      const data = await res.json();
+
+      const total = data.approximate_member_count;
+
+      if (typeof total === 'number') {
+        document
+          .querySelectorAll('.js-member-count')
+          .forEach(el => {
+            el.textContent =
+              total.toLocaleString('en-US');
+          });
+      }
+
+    } catch (error) {
+      console.warn(
+        'Member count update failed:',
+        error
+      );
+    }
+  }
+
+
+  // =========================================================
+  // LOAD LIVE LEADERBOARD
+  // =========================================================
+
+  async function loadLeaderboard() {
+    try {
+
+      const response = await fetch(API_URL, {
+        cache: 'no-store'
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `API Error: ${response.status}`
+        );
+      }
+
+      const data = await response.json();
+
+      console.log(
+        '🔥 SINATRA LIVE LEADERBOARD:',
+        data
+      );
+
+      if (!data.success) {
+        throw new Error(
+          'Leaderboard API returned false'
+        );
+      }
+
+      renderMessageLeaderboard(
+        data.messages || []
+      );
+
+      renderVoiceLeaderboard(
+        data.voice || []
+      );
+
+    } catch (error) {
+
+      console.error(
+        '❌ Leaderboard connection failed:',
+        error
+      );
+
+    }
+  }
+
+
+  // =========================================================
+  // FORMAT NUMBER
+  // =========================================================
+
+  function formatNumber(value) {
+    return Number(value || 0)
+      .toLocaleString('en-US');
+  }
+
+
+  // =========================================================
+  // FORMAT VOICE TIME
+  // =========================================================
+
+  function formatVoice(seconds) {
+
+    seconds = Number(seconds || 0);
+
+    const hours = Math.floor(
+      seconds / 3600
+    );
+
+    const minutes = Math.floor(
+      (seconds % 3600) / 60
+    );
+
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    }
+
+    if (minutes > 0) {
+      return `${minutes}m`;
+    }
+
+    return `${seconds}s`;
+  }
+
+
+  // =========================================================
+  // SECURITY
+  // =========================================================
+
+  function escapeHTML(text) {
+
+    return String(text || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+
+  }
+
+
+  // =========================================================
+  // MESSAGE LEADERBOARD
+  // =========================================================
+
+  function renderMessageLeaderboard(users) {
+
+    const panel =
+      document.querySelector(
+        '[data-panel="msg"]'
+      );
+
+    if (!panel) return;
+
+
+    if (!users.length) {
+
+      panel.innerHTML = `
+        <p class="lb-note">
+          Одоогоор message data алга.
+        </p>
+      `;
+
+      return;
+    }
+
+
+    // TOP 3
+
+    const top3 =
+      users.slice(0, 3);
+
+    const rest =
+      users.slice(3);
+
+
+    const maxValue =
+      Math.max(
+        ...users.map(
+          user => Number(user.value || 0)
+        )
+      );
+
+
+    const podiumHTML =
+      top3.map((user, index) => {
+
+        const name =
+          escapeHTML(user.name);
+
+        const initials =
+          escapeHTML(user.initials);
+
+        const value =
+          formatNumber(user.value);
+
+
+        let position = '';
+
+        if (index === 0) {
+          position = 'p1-wrap';
+        }
+
+        if (index === 1) {
+          position = 'p2-wrap';
+        }
+
+        if (index === 2) {
+          position = 'p3-wrap';
+        }
+
+
+        return `
+          <div
+            class="podium-card ${position}"
+            style="order:${index + 1}"
+          >
+
+            ${
+              index === 0
+                ? '<span class="crown">♛</span>'
+                : ''
+            }
+
+            <div class="podium-avatar">
+              ${initials}
+            </div>
+
+            <p class="podium-name">
+              ${name}
+            </p>
+
+            <div class="pedestal p${index + 1}">
+
+              <span class="rank-num">
+                ${index + 1}
+              </span>
+
+              <span class="val">
+                ${value} мессеж
+              </span>
+
+            </div>
+
+          </div>
+        `;
+
+      }).join('');
+
+
+    // OTHER MEMBERS
+
+    const tableRows =
+      rest.map((user, index) => {
+
+        const rank =
+          index + 4;
+
+        const value =
+          Number(user.value || 0);
+
+        const percent =
+          maxValue > 0
+            ? Math.round(
+                (value / maxValue) * 100
+              )
+            : 0;
+
+
+        return `
+          <tr>
+
+            <td>
+              ${rank}
+            </td>
+
+            <td>
+
+              <span class="lb-avatar-sm">
+                ${escapeHTML(user.initials)}
+              </span>
+
+              ${escapeHTML(user.name)}
+
+            </td>
+
+            <td>
+              ${formatNumber(value)}
+            </td>
+
+            <td>
+
+              <div class="bar">
+
+                <span
+                  style="width:${percent}%"
+                ></span>
+
+              </div>
+
+            </td>
+
+          </tr>
+        `;
+
+      }).join('');
+
+
+    panel.innerHTML = `
+
+      <div class="podium">
+        ${podiumHTML}
+      </div>
+
+
+      <table class="lb-table">
+
+        <thead>
+
+          <tr>
+            <th>№</th>
+            <th>Гишүүн</th>
+            <th>Мессеж</th>
+            <th>Идэвх</th>
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+          ${tableRows}
+        </tbody>
+
+      </table>
+
+
+      <p class="lb-note">
+        🔴 LIVE • Discord bot-оос шинэчлэгдэж байна
+      </p>
+
+    `;
+  }
+
+
+  // =========================================================
+  // VOICE LEADERBOARD
+  // =========================================================
+
+  function renderVoiceLeaderboard(users) {
+
+    const panel =
+      document.querySelector(
+        '[data-panel="voice"]'
+      );
+
+    if (!panel) return;
+
+
+    if (!users.length) {
+
+      panel.innerHTML = `
+        <p class="lb-note">
+          Одоогоор voice data алга.
+        </p>
+      `;
+
+      return;
+    }
+
+
+    const top3 =
+      users.slice(0, 3);
+
+    const rest =
+      users.slice(3);
+
+
+    const maxValue =
+      Math.max(
+        ...users.map(
+          user => Number(user.value || 0)
+        )
+      );
+
+
+    // TOP 3
+
+    const podiumHTML =
+      top3.map((user, index) => {
+
+        const name =
+          escapeHTML(user.name);
+
+        const initials =
+          escapeHTML(user.initials);
+
+        const seconds =
+          Number(user.value || 0);
+
+
+        let position = '';
+
+        if (index === 0) {
+          position = 'p1-wrap';
+        }
+
+        if (index === 1) {
+          position = 'p2-wrap';
+        }
+
+        if (index === 2) {
+          position = 'p3-wrap';
+        }
+
+
+        return `
+          <div
+            class="podium-card ${position}"
+            style="order:${index + 1}"
+          >
+
+            ${
+              index === 0
+                ? '<span class="crown">♛</span>'
+                : ''
+            }
+
+            <div class="podium-avatar">
+              ${initials}
+            </div>
+
+            <p class="podium-name">
+              ${name}
+            </p>
+
+            <div class="pedestal p${index + 1}">
+
+              <span class="rank-num">
+                ${index + 1}
+              </span>
+
+              <span class="val">
+                ${formatVoice(seconds)}
+              </span>
+
+            </div>
+
+          </div>
+        `;
+
+      }).join('');
+
+
+    // OTHER MEMBERS
+
+    const tableRows =
+      rest.map((user, index) => {
+
+        const rank =
+          index + 4;
+
+        const seconds =
+          Number(user.value || 0);
+
+
+        const percent =
+          maxValue > 0
+            ? Math.round(
+                (seconds / maxValue) * 100
+              )
+            : 0;
+
+
+        return `
+          <tr>
+
+            <td>
+              ${rank}
+            </td>
+
+            <td>
+
+              <span class="lb-avatar-sm">
+                ${escapeHTML(user.initials)}
+              </span>
+
+              ${escapeHTML(user.name)}
+
+            </td>
+
+            <td>
+              ${formatVoice(seconds)}
+            </td>
+
+            <td>
+
+              <div class="bar">
+
+                <span
+                  style="width:${percent}%"
+                ></span>
+
+              </div>
+
+            </td>
+
+          </tr>
+        `;
+
+      }).join('');
+
+
+    panel.innerHTML = `
+
+      <div class="podium">
+        ${podiumHTML}
+      </div>
+
+
+      <table class="lb-table">
+
+        <thead>
+
+          <tr>
+            <th>№</th>
+            <th>Гишүүн</th>
+            <th>Voice</th>
+            <th>Идэвх</th>
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+          ${tableRows}
+        </tbody>
+
+      </table>
+
+
+      <p class="lb-note">
+        🔴 LIVE • Discord bot-оос шинэчлэгдэж байна
+      </p>
+
+    `;
+  }
+
+
+  // =========================================================
+  // LEADERBOARD TABS
+  // =========================================================
+
+  document
+    .querySelectorAll('.lb-tab-btn')
+    .forEach(button => {
+
+      button.addEventListener(
+        'click',
+        () => {
+
+          document
+            .querySelectorAll('.lb-tab-btn')
+            .forEach(btn => {
+              btn.classList.remove(
+                'active'
+              );
+            });
+
+
+          button.classList.add(
+            'active'
+          );
+
+
+          const target =
+            button.dataset.tab;
+
+
+          document
+            .querySelectorAll('.lb-panel')
+            .forEach(panel => {
+
+              panel.style.display =
+                panel.dataset.panel === target
+                  ? 'block'
+                  : 'none';
+
+            });
+
+        }
+      );
+
+    });
+
+
+  // =========================================================
+  // START
+  // =========================================================
+
+  updateMemberCount();
+
+  loadLeaderboard();
+
+
+  // Member count → 5 минут тутам
+
+  setInterval(
+    updateMemberCount,
+    5 * 60 * 1000
+  );
+
+
+  // Leaderboard → 10 секунд тутам
+
+  setInterval(
+    loadLeaderboard,
+    10 * 1000
+  );
+
+</script>
+```
+
+**Нэг л нэмэлт зүйл:** `bot.js` дээр voice API-г яг секундын дата өгөхөөр болгохын тулд өмнөх:
+
+```js
+value: Math.round(row.seconds / 3600)
+```
+
+гэдгийг:
+
+```js
+value: row.seconds
+```
+
+болгоорой.
+
+Тэгээд bot-оо restart хийнэ:
+
+```bash
+node bot.js
+```
+
+Дараа нь website-аа refresh хийхэд **199 гэх мэт fake тоонуудын оронд Discord-ийн бодит member count, bot-ийн бодит message/voice leaderboard** гарна.
+
+</body>
+</html>
